@@ -1,7 +1,7 @@
 {
-  "name": "action-watermark",
+  "name": "buzzle-action-watermark",
   "version": "1.0.7",
-  "description": "Action Module for adding watermark to encoded video using nexrenderer",
+  "description": "Action Module for adding watermark to encoded video using nexrender",
   "main": "index.js",
   "scripts": {
     "test": "node index.js"
