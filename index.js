@@ -74,34 +74,41 @@ module.exports = function (
   settings,
   { input, watermark, output, position = "center" }
 ) {
-  input = input || job.output;
-  output = output || "watermarked.mp4";
-  if (!path.isAbsolute(input)) input = path.join(job.workpath, input);
-  if (!path.isAbsolute(output)) output = path.join(job.workpath, output);
+  return new Promise((resolve, reject) => {
+    input = input || job.output;
+    output = output || "watermarked.mp4";
+    if (!path.isAbsolute(input)) input = path.join(job.workpath, input);
+    if (!path.isAbsolute(output)) output = path.join(job.workpath, output);
 
-  settings.logger.log(`[${job.uid}] starting action-watermark on [${input}] `);
+    settings.logger.log(
+      `[${job.uid}] starting action-watermark on [${input}] `
+    );
 
-  getBinary(job, settings).then((p) => {
-    ffmpeg.setFfmpegPath(p);
+    getBinary(job, settings).then((p) => {
+      ffmpeg.setFfmpegPath(p);
 
-    ffmpeg()
-      .input(input)
-      .input(watermark)
-      .videoCodec("libx264")
-      .outputOptions("-pix_fmt yuv420p")
-      .complexFilter([`overlay=${getOverlayByPosition(position || "center")}`])
-      .on("error", function (err) {
-        settings.logger.log("add watermark fail: " + err.message);
-      })
-      .on("progress", function (value) {
-        settings.logger.log(`In Progress..${value}%`);
-      })
-      .on("end", function () {
-        settings.logger.log("added watermark successfully");
-        job.output = output;
-        resolve(job);
-      })
-      .save(output);
+      ffmpeg()
+        .input(input)
+        .input(watermark)
+        .videoCodec("libx264")
+        .outputOptions("-pix_fmt yuv420p")
+        .complexFilter([
+          `overlay=${getOverlayByPosition(position || "center")}`,
+        ])
+        .on("error", function (err) {
+          settings.logger.log("add watermark fail: " + err.message);
+          reject(err);
+        })
+        .on("progress", function (value) {
+          settings.logger.log(`In Progress..${value}%`);
+        })
+        .on("end", function () {
+          settings.logger.log("added watermark successfully");
+          job.output = output;
+          resolve(job);
+        })
+        .save(output);
+    });
   });
 };
 
