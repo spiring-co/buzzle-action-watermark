@@ -8,9 +8,8 @@ const path = require("path");
 const getBinary = (job, settings) => {
   return new Promise((resolve, reject) => {
     const version = "b4.2.2";
-    const filename = `ffmpeg-${version}${
-      process.platform == "win32" ? ".exe" : ""
-    }`;
+    const filename = `ffmpeg-${version}${process.platform == "win32" ? ".exe" : ""
+      }`;
     const fileurl = `https://github.com/eugeneware/ffmpeg-static/releases/download/${version}/${process.platform}-x64`;
     const output = path.join(settings.workpath, filename);
 
@@ -39,17 +38,16 @@ const getBinary = (job, settings) => {
         res.ok
           ? res
           : Promise.reject({
-              reason: "Initial error downloading file",
-              meta: { fileurl, error: res.error },
-            })
+            reason: "Initial error downloading file",
+            meta: { fileurl, error: res.error },
+          })
       )
       .then((res) => {
         const progress = new nfp(res);
 
         progress.on("progress", (p) => {
           process.stdout.write(
-            `${Math.floor(p.progress * 100)}% - ${p.doneh}/${p.totalh} - ${
-              p.rateh
+            `${Math.floor(p.progress * 100)}% - ${p.doneh}/${p.totalh} - ${p.rateh
             } - ${p.etah}                       \r`
           );
         });
@@ -72,8 +70,9 @@ const getBinary = (job, settings) => {
 module.exports = function (
   job,
   settings,
-  { input, watermark, output, position = "center" }
+  { input, watermark, output, onStart, onComplete, position = "center" }
 ) {
+  onStart()
   return new Promise((resolve, reject) => {
     input = input || job.output;
     output = output || "watermarked.mp4";
@@ -97,6 +96,7 @@ module.exports = function (
         ])
         .on("error", function (err) {
           settings.logger.log("add watermark fail: " + err.message);
+          onComplete()
           reject(err);
         })
         .on("progress", function (value) {
@@ -105,6 +105,7 @@ module.exports = function (
         .on("end", function () {
           settings.logger.log("added watermark successfully");
           job.output = output;
+          onComplete()
           resolve(job);
         })
         .save(output);
