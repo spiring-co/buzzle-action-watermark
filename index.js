@@ -89,8 +89,6 @@ module.exports = function (
       ffmpeg()
         .input(input)
         .input(watermark)
-        .videoCodec("libx264")
-        .outputOptions("-pix_fmt yuv420p")
         .complexFilter([
           `overlay=${getOverlayByPosition(position || "center")}`,
         ])
