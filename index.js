@@ -89,9 +89,8 @@ module.exports = function (
       ffmpeg()
         .input(input)
         .input(watermark)
-        .complexFilter([
-          `overlay=${getOverlayByPosition(position || "center")}`,
-        ])
+        .inputOptions([
+          `-filter_complex overlay=${getOverlayByPosition(position || "center")}`])
         .on("error", function (err) {
           settings.logger.log("add watermark fail: " + err.message);
           onComplete()
