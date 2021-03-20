@@ -90,9 +90,11 @@ module.exports = function (
         .input(input)
         .input(watermark)
         .inputOptions([
-          `-filter_complex overlay=${getOverlayByPosition(position || "center")}`])
-        .on("error", function (err) {
+          `-filter_complex overlay=${getOverlayByPosition(position || "center")}`,
+        ]).outputOptions("-pix_fmt yuv420p")
+        .on("error", function (err, stdout, stderr) {
           settings.logger.log("add watermark fail: " + err.message);
+          settings.logger.log("watermark stderr: " + stderr);
           onComplete()
           reject(err);
         })
