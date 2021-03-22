@@ -93,7 +93,7 @@ module.exports = function (
           `-filter_complex overlay=${getOverlayByPosition(position || "center")}`,
         ])
         .input(watermark)
-        .outputOptions(['-pix_fmt yuv420p'])
+        .outputOptions(['-pix_fmt yuv420p', '-max_muxing_queue_size 1024'])
         .on("error", function (err, stdout, stderr) {
           settings.logger.log("add watermark fail: " + err.message);
           settings.logger.log("watermark stderr: " + stderr);
