@@ -88,10 +88,12 @@ module.exports = function (
 
       ffmpeg()
         .input(input)
-        .input(watermark)
         .inputOptions([
+          '-vcodec h264', '-acodec aac',
           `-filter_complex overlay=${getOverlayByPosition(position || "center")}`,
-        ]).outputOptions("-pix_fmt yuv420p")
+        ])
+        .input(watermark)
+        .outputOptions(['-pix_fmt yuv420p'])
         .on("error", function (err, stdout, stderr) {
           settings.logger.log("add watermark fail: " + err.message);
           settings.logger.log("watermark stderr: " + stderr);
